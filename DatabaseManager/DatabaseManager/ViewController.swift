@@ -24,7 +24,10 @@ class ViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+    }
+
+    
+    func getAPICaller(){
         let url = URL(string: "http://jsonplaceholder.typicode.com/users/1")
         URLSession.shared.dataTask(with: url!, completionHandler: {
             (data, response, error) in
@@ -39,9 +42,74 @@ class ViewController: UIViewController {
                 }
             }
         }).resume()
+    }
+    
+    func APICallerPOST(){
+   
+        let strUrl = "do_forgot_password"
+        guard let serviceUrl = URL(string: strUrl) else {
+            return
+        }
+
+        let parameterDictionary = ["email" : "test@gmail.com", "panel" : "app"]
+        var request = URLRequest(url: serviceUrl)
+        request.httpMethod = "POST"
+        guard let httpBody = try? JSONSerialization.data(withJSONObject: parameterDictionary, options: []) else {
+            return
+        }
+        //request.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
+        request.httpMethod = "POST"
+        let postString = "email :test@gmail.com,panel:app"
+        request.httpBody = postString.data(using: .utf8)
+        
+        //request.httpBody = httpBody
+        request.setValue("Application/json", forHTTPHeaderField: "Content-Type")
+        let session = URLSession.shared
+        session.dataTask(with: request) { (data, response, error) in
+            if let response = response {
+                print(response)
+            }
+            if let data = data {
+                do {
+                   let json = try JSONSerialization.jsonObject(with: data, options: [])
+                    print(json)
+                } catch {
+                    print(error.localizedDescription)
+                }
+            }
+        }.resume()
+    }
+    
+    func data_request()
+    {
+        let url:URL = URL(string: "http://topsdemo.co.in/qa/alcohol_ordering/v.1.4/driver/do_forgot_password")!
+        let session = URLSession.shared
+        
+        let request = NSMutableURLRequest(url: url)
+        request.httpMethod = "POST"
+        request.cachePolicy = NSURLRequest.CachePolicy.reloadIgnoringCacheData
+        
+        let paramString = "email:test@gmail.com&panel:app"
+        request.httpBody = paramString.data(using: String.Encoding.utf8)
+        
+        let task = session.dataTask(with: request as URLRequest, completionHandler: {
+            (
+            data, response, error) in
+            
+            guard let _:Data = data, let _:URLResponse = response  , error == nil else {
+                print("error")
+                return
+            }
+            
+            let dataString = NSString(data: data!, encoding: String.Encoding.utf8.rawValue)
+            print(dataString)
+            
+        })
+        
+        task.resume()
         
     }
-
+    
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
